@@ -5,6 +5,7 @@
 const express = require('express');
 const pg = require('pg');
 const cors = require('cors');
+const bodyParser = require('body-parser');
 
 //Application Setup
 
@@ -20,6 +21,8 @@ client.on('error', err => console.log(err));
 
 // application middleware
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:true}));
 
 //API endpoints
 
@@ -38,40 +41,43 @@ app.get('/api/v1/books/:id', (req, res) => {
 });
 
 app.post('/api/v1/books', (req, res) => {
+  console.log(req.body);
   client.query(
     `INSERT INTO books(title, author, image_url, isbn, description) 
     VALUES($1, $2, $3, $4, $5);`,
     [
       req.body.title,
       req.body.author,
-      req.body.img_url,
+      req.body.image_url,
       req.body.isbn,
       req.body.description
     ]
   )
     .then(function() {
-      res.send('insert complete')
+      res.send('Insert complete')
     })
     .catch(function(err) {
       console.error(err);
     });
 });
 
-app.put('api/v1/books', (req, res) => {
+app.put('/api/v1/books/:id', function(req, res) {
   client.query(`
   UPDATE books
   SET title=$1, author=$2, isbn=$3, image_url=$4, description=$5
-  WHERE book_id=$6
+  WHERE book_id=$6;
   `, [
     req.body.title,
     req.body.author,
     req.body.isbn,
-    req.body.img_url,
+    req.body.image_url,
     req.body.description,
-    req.params.id
+    req.params.book_id
   ])
-    .then(() => res.send('Update complete'))
-    .catch(function(err) {
+    .then(() => {
+      res.send('update complete');
+    })
+    .catch(err => {
       console.error(err);
     });
 });
