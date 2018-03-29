@@ -82,6 +82,15 @@ app.put('/api/v1/books/:id', function(req, res) {
     });
 });
 
+app.delete('/api/v1/books/:id', (req, res) => {
+  client.query(
+    `DELETE FROM books WHERE book_id=$1;`,
+    [req.params.id]
+  )
+    .then(() => res.send('Delete complete'))
+    .catch(console.error);
+});
+
 app.get('*', (req, res) => res.redirect(CLIENT_URL));
 
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
